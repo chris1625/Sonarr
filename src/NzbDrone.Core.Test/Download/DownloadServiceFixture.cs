@@ -32,9 +32,9 @@ namespace NzbDrone.Core.Test.Download
                 .Setup(v => v.GetDownloadClients())
                 .Returns(_downloadClients);
 
-            Mocker.GetMock<IProvideDownloadClient>()
+            /*Mocker.GetMock<IProvideDownloadClient>()
                 .Setup(v => v.GetDownloadClient(It.IsAny<DownloadProtocol>()))
-                .Returns<DownloadProtocol>(v => _downloadClients.FirstOrDefault(d => d.Protocol == v));
+                .Returns<DownloadProtocol>(v => _downloadClients.FirstOrDefault(d => d.Protocol == v)); */
 
             var episodes = Builder<Episode>.CreateListOfSize(2)
                 .TheFirst(1).With(s => s.Id = 12)

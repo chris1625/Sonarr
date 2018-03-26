@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Text.RegularExpressions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -37,6 +37,11 @@ namespace NzbDrone.Core.Indexers.Torznab
                     return new ValidationFailure("", "Either 'Categories' or 'Anime Categories' must be provided");
                 }
 
+                if (newznab.DownloadClient.Empty())
+                {
+                    return new ValidationFailure("", "A download client must be provided");
+                }
+
                 return null;
             });
 
@@ -59,6 +64,9 @@ namespace NzbDrone.Core.Indexers.Torznab
 
         [FieldDefinition(6, Type = FieldType.Textbox, Label = "Minimum Seeders", HelpText = "Minimum number of seeders required.", Advanced = true)]
         public int MinimumSeeders { get; set; }
+
+        [FieldDefinition(7, Label = "Download Client", HelpText = "Name of the download client this indexer will use", Advanced = false)]
+        public string DownloadClient { get; set; }
 
         public override NzbDroneValidationResult Validate()
         {

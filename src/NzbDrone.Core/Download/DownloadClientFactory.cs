@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation.Results;
@@ -36,6 +36,11 @@ namespace NzbDrone.Core.Download
             return base.Active().Where(c => c.Enable).ToList();
         }
 
+        public List<DownloadClientDefinition> ActiveClients()
+        {
+            return base.Active().Where(c => c.Enable).ToList();
+        }
+
         public override void SetProviderCharacteristics(IDownloadClient provider, DownloadClientDefinition definition)
         {
             base.SetProviderCharacteristics(provider, definition);
@@ -46,6 +51,11 @@ namespace NzbDrone.Core.Download
         public List<IDownloadClient> DownloadHandlingEnabled(bool filterBlockedClients = true)
         {
             var enabledClients = GetAvailableProviders();
+
+            foreach (var i in enabledClients)
+            {
+                _logger.Error("Download client has name {0}", i.Definition.Name);
+            }
 
             if (filterBlockedClients)
             {

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using NzbDrone.Core.Annotations;
 using NzbDrone.Core.Validation;
 using System.Text.RegularExpressions;
@@ -32,6 +32,9 @@ namespace NzbDrone.Core.Indexers.Nyaa
 
         [FieldDefinition(2, Type = FieldType.Textbox, Label = "Minimum Seeders", HelpText = "Minimum number of seeders required.", Advanced = true)]
         public int MinimumSeeders { get; set; }
+
+        [FieldDefinition(7, Label = "Download Client", HelpText = "Name of the download client this indexer will use", Advanced = false)]
+        public string DownloadClient { get; set; }
 
         public NzbDroneValidationResult Validate()
         {

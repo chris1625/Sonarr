@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using NzbDrone.Core.Indexers;
 
@@ -6,7 +6,7 @@ namespace NzbDrone.Core.Download
 {
     public interface IProvideDownloadClient
     {
-        IDownloadClient GetDownloadClient(DownloadProtocol downloadProtocol);
+        IDownloadClient GetDownloadClient(string clientName);
         IEnumerable<IDownloadClient> GetDownloadClients();
         IDownloadClient Get(int id);
     }
@@ -20,9 +20,10 @@ namespace NzbDrone.Core.Download
             _downloadClientFactory = downloadClientFactory;
         }
 
-        public IDownloadClient GetDownloadClient(DownloadProtocol downloadProtocol)
+        public IDownloadClient GetDownloadClient(string clientName)
         {
-            return _downloadClientFactory.GetAvailableProviders().FirstOrDefault(v => v.Protocol == downloadProtocol);
+            return _downloadClientFactory.DownloadHandlingEnabled(false).Find(v => v.Definition.Name == clientName);
+            //return _downloadClientFactory.GetAvailableProviders().Find(v => v.Name == clientName);
         }
 
         public IEnumerable<IDownloadClient> GetDownloadClients()
