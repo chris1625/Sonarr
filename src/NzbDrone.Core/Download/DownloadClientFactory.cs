@@ -52,11 +52,6 @@ namespace NzbDrone.Core.Download
         {
             var enabledClients = GetAvailableProviders();
 
-            foreach (var i in enabledClients)
-            {
-                _logger.Error("Download client has name {0}", i.Definition.Name);
-            }
-
             if (filterBlockedClients)
             {
                 return FilterBlockedClients(enabledClients).ToList();

@@ -22,7 +22,7 @@ namespace NzbDrone.Core.Download
 
         public IDownloadClient GetDownloadClient(string clientName)
         {
-            return _downloadClientFactory.DownloadHandlingEnabled(false).Find(v => v.Definition.Name == clientName);
+            return _downloadClientFactory.DownloadHandlingEnabled(false).Find(v => v.Definition.Name.Equals(clientName));
             //return _downloadClientFactory.GetAvailableProviders().Find(v => v.Name == clientName);
         }
 
