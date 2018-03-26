@@ -53,15 +53,25 @@ namespace NzbDrone.Core.Download
 
             var downloadTitle = remoteEpisode.Release.Title;
 
-            // First get indexer from release
-            var releaseIndexer = _indexerFactory.Get(remoteEpisode.Release.IndexerId);
+            IDownloadClient downloadClient;
 
-            // Now grab the download client's name from the indexer's settings
-            var indexerSettings = releaseIndexer.Settings as ITorrentIndexerSettings;
-            var clientName = indexerSettings.DownloadClient;
-            _logger.ProgressInfo("Using download client with name {0}", clientName);
+            // If this is a torrent, we will assign the client based on its settings
+            if (remoteEpisode.Release.DownloadProtocol == DownloadProtocol.Torrent)
+            {
+                // First get indexer from release
+                var releaseIndexer = _indexerFactory.Get(remoteEpisode.Release.IndexerId);
 
-            var downloadClient = _downloadClientProvider.GetDownloadClient(clientName);
+                // Now grab the download client's name from the indexer's settings
+                var indexerSettings = releaseIndexer.Settings as ITorrentIndexerSettings;
+                var clientName = indexerSettings.DownloadClient;
+                _logger.ProgressInfo("Using download client with name {0}", clientName);
+
+                downloadClient = _downloadClientProvider.GetDownloadClient(clientName);
+            }
+            else
+            {
+                downloadClient = _downloadClientProvider.GetDownloadClient(remoteEpisode.Release.DownloadProtocol);
+            }
 
             if (downloadClient == null)
             {
