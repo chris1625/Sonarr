@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.DecisionEngine;
@@ -50,14 +50,7 @@ namespace NzbDrone.Core.MediaFiles.EpisodeImport.Specifications
                 if (item.Quality.Quality != Quality.Unknown && item.Quality != localEpisode.Quality)
                 {
                     _logger.Debug("Quality for grabbed release ({0}) does not match the quality of the file ({1})", item.Quality, localEpisode.Quality);
-
-                    /* Since the most common source of this error is a release
-                     * whose title does not contain the quality (and not
-                     * simply a mistitled release) we will not reject this
-                     * release. We will still log it, though; the quality
-                     * must also later be changed manually in sonarr.
-                     */
-                    //return Decision.Reject("File quality does not match quality of the grabbed release");
+                    return Decision.Reject("File quality does not match quality of the grabbed release");
                 }
             }
 
