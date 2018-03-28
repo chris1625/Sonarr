@@ -24,6 +24,7 @@ namespace NzbDrone.Core.Download
         private readonly IProvideDownloadClient _downloadClientProvider;
         private readonly IDownloadClientStatusService _downloadClientStatusService;
         private readonly IIndexerStatusService _indexerStatusService;
+        private readonly IIndexerFactory _indexerFactory;
         private readonly IRateLimitService _rateLimitService;
         private readonly IEventAggregator _eventAggregator;
         private readonly Logger _logger;
@@ -31,6 +32,7 @@ namespace NzbDrone.Core.Download
         public DownloadService(IProvideDownloadClient downloadClientProvider,
                                IDownloadClientStatusService downloadClientStatusService,
                                IIndexerStatusService indexerStatusService,
+                               IIndexerFactory indexerFactory,
                                IRateLimitService rateLimitService,
                                IEventAggregator eventAggregator,
                                Logger logger)
@@ -38,6 +40,7 @@ namespace NzbDrone.Core.Download
             _downloadClientProvider = downloadClientProvider;
             _downloadClientStatusService = downloadClientStatusService;
             _indexerStatusService = indexerStatusService;
+            _indexerFactory = indexerFactory;
             _rateLimitService = rateLimitService;
             _eventAggregator = eventAggregator;
             _logger = logger;
@@ -49,7 +52,26 @@ namespace NzbDrone.Core.Download
             Ensure.That(remoteEpisode.Episodes, () => remoteEpisode.Episodes).HasItems();
 
             var downloadTitle = remoteEpisode.Release.Title;
-            var downloadClient = _downloadClientProvider.GetDownloadClient(remoteEpisode.Release.DownloadProtocol);
+
+            IDownloadClient downloadClient;
+
+            // If this is a torrent, we will assign the client based on its settings
+            if (remoteEpisode.Release.DownloadProtocol == DownloadProtocol.Torrent)
+            {
+                // First get indexer from release
+                var releaseIndexer = _indexerFactory.Get(remoteEpisode.Release.IndexerId);
+
+                // Now grab the download client's name from the indexer's settings
+                var indexerSettings = releaseIndexer.Settings as ITorrentIndexerSettings;
+                var clientName = indexerSettings.DownloadClient;
+                _logger.ProgressInfo("Using download client with name {0}", clientName);
+
+                downloadClient = _downloadClientProvider.GetDownloadClient(clientName);
+            }
+            else
+            {
+                downloadClient = _downloadClientProvider.GetDownloadClient(remoteEpisode.Release.DownloadProtocol);
+            }
 
             if (downloadClient == null)
             {
